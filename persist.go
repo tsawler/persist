@@ -111,7 +111,7 @@ func connectToPostgres(dsn string) (*sql.DB, error) {
 // dsn can be one of ":memory:" for in memory, or "path/to/some.db" for disk based storage.
 // Note that to avoid "database is locked errors" you must set MaxOpenConns to 1 so that only 1
 // connection is  ever used by the DB, allowing concurrent access to DB without making the
-// writes concurrent
+// writes concurrent.
 func connectToSQLite(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite", dsn)
 	if err != nil {
