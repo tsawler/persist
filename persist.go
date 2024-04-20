@@ -12,47 +12,47 @@ import (
 )
 
 var (
-	MaxOpenDbConn = 25
-	MaxIdleDbConn = 25
-	MaxDbLifetime = 5 * time.Minute
+	MaxOpenConns    = 12              // Maximum number of open connections in our pool.
+	MaxIdleConns    = 6               // Maximum idle connections in our pool.
+	ConnMaxLifetime = 0 * time.Second // Max lifetime for a connection (how long before it expires). 0 is forever.
 )
 
+// Options holds useful options for a pool of connections.
 type Options struct {
 	MaxOpen     int
 	MaxIdle     int
 	MaxLifetime time.Duration
 }
 
-type Database struct {
-	Engine *sql.DB
-}
-
-func New(db, dsn string, ops *Options) (*Database, error) {
+// New is a factory method which takes a db type, a dsn and options and attempts
+// to open a connection to the database and return a pool of connections.
+func New(db, dsn string, ops *Options) (*sql.DB, error) {
 	engine := strings.ToLower(db)
 
 	if ops != nil {
 		if ops.MaxLifetime != 0 {
-			MaxDbLifetime = ops.MaxLifetime
+			ConnMaxLifetime = ops.MaxLifetime
 		}
 		if ops.MaxOpen != 0 {
-			MaxOpenDbConn = ops.MaxOpen
+			MaxOpenConns = ops.MaxOpen
 		}
 		if ops.MaxIdle != 0 {
-			MaxIdleDbConn = ops.MaxIdle
+			MaxIdleConns = ops.MaxIdle
 		}
 	}
 
 	switch engine {
 	case "mysql", "mariadb":
-		return initMySQLDB(dsn)
+		return connectToMySQL(dsn)
 	case "postgres", "pg", "postgresql":
-		return initPostgresDB(dsn)
+		return connectToPostgres(dsn)
 	default:
 		return nil, errors.New("invalid database engine supplied")
 	}
 }
 
-func initMySQLDB(dsn string) (*Database, error) {
+// connectToMySQL attempts to get a pool of connections for a MySQL/MariaDB database.
+func connectToMySQL(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
@@ -63,26 +63,27 @@ func initMySQLDB(dsn string) (*Database, error) {
 		return nil, err
 	}
 
-	db.SetMaxOpenConns(MaxOpenDbConn)
-	db.SetMaxIdleConns(MaxIdleDbConn)
-	db.SetConnMaxLifetime(MaxDbLifetime)
+	db.SetMaxOpenConns(MaxOpenConns)
+	db.SetMaxIdleConns(MaxIdleConns)
+	db.SetConnMaxLifetime(ConnMaxLifetime)
 
-	return &Database{Engine: db}, nil
+	return db, nil
 }
 
-func initPostgresDB(dsn string) (*Database, error) {
+// connectToPostgres attempts to get a pool of connections for a postgres database.
+func connectToPostgres(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		panic(err)
 	}
 
-	db.SetMaxOpenConns(MaxOpenDbConn)
-	db.SetMaxIdleConns(MaxIdleDbConn)
-	db.SetConnMaxLifetime(MaxDbLifetime)
+	db.SetMaxOpenConns(MaxOpenConns)
+	db.SetMaxIdleConns(MaxIdleConns)
+	db.SetConnMaxLifetime(ConnMaxLifetime)
 
 	if err = db.Ping(); err != nil {
 		return nil, err
 	}
 
-	return &Database{Engine: db}, nil
+	return db, nil
 }
