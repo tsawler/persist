@@ -74,7 +74,7 @@ func connectToMySQL(dsn string) (*sql.DB, error) {
 func connectToPostgres(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	db.SetMaxOpenConns(MaxOpenConns)
