@@ -12,20 +12,20 @@ import (
 )
 
 var (
-	MaxOpenConns    = 12              // Maximum number of open connections in our pool.
-	MaxIdleConns    = 6               // Maximum idle connections in our pool.
+	MaxOpenConns    = 12              // Maximum number of open connections in our pgPool.
+	MaxIdleConns    = 6               // Maximum idle connections in our pgPool.
 	ConnMaxLifetime = 0 * time.Second // Max lifetime for a connection (how long before it expires). 0 is forever.
 )
 
-// Options holds useful options for a pool of connections.
+// Options holds useful options for a pgPool of connections.
 type Options struct {
 	MaxOpen     int
 	MaxIdle     int
 	MaxLifetime time.Duration
 }
 
-// New is a factory method which takes a db type, a dsn and options and attempts
-// to open a connection to the database and return a pool of connections.
+// New is a factory method which takes a db type, a pgConnectionString and options and attempts
+// to open a connection to the database and return a pgPool of connections.
 func New(db, dsn string, ops *Options) (*sql.DB, error) {
 	engine := strings.ToLower(db)
 
@@ -51,7 +51,7 @@ func New(db, dsn string, ops *Options) (*sql.DB, error) {
 	}
 }
 
-// connectToMySQL attempts to get a pool of connections for a MySQL/MariaDB database.
+// connectToMySQL attempts to get a pgPool of connections for a MySQL/MariaDB database.
 func connectToMySQL(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
@@ -70,7 +70,7 @@ func connectToMySQL(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
-// connectToPostgres attempts to get a pool of connections for a postgres database.
+// connectToPostgres attempts to get a pgPool of connections for a postgres database.
 func connectToPostgres(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
