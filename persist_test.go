@@ -30,6 +30,18 @@ func Test_New(t *testing.T) {
 		if err == nil && !tt.expectSuccess {
 			t.Errorf("%s: expected error but did not get one", tt.name)
 		}
+
+		if tt.ops != nil {
+			if tt.ops.MaxIdle != 4 {
+				t.Errorf("%s: wrong value for MaxIdle; expected 4 but got %d", tt.name, tt.ops.MaxIdle)
+			}
+			if tt.ops.MaxOpen != 10 {
+				t.Errorf("%s: wrong value for MaxOpen; expected 10 but got %d", tt.name, tt.ops.MaxOpen)
+			}
+			if tt.ops.MaxLifetime != 1*time.Hour {
+				t.Errorf("%s: wrong value for MaxLifetime; expected 1 hour but got %d", tt.name, tt.ops.MaxLifetime)
+			}
+		}
 	}
 }
 
