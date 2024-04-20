@@ -21,12 +21,15 @@ var (
 	dbName   = "users_test"
 	dsn      = "host=%s port=%s user=%s password=%s dbname=%s sslmode=disable timezone=UTC connect_timeout=5"
 )
-
+var pgTestDatabaseConnectionString string
+var mysqlTestDatabaseConnectionString string
 var resource *dockertest.Resource
 var pool *dockertest.Pool
 var testDB *sql.DB
 
 func TestMain(m *testing.M) {
+	pgTestDatabaseConnectionString = fmt.Sprintf(dsn, host, port, user, password, dbName)
+
 	// connect to docker; fail if docker not running
 	p, err := dockertest.NewPool("")
 	if err != nil {

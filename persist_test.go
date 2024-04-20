@@ -13,10 +13,11 @@ func Test_New(t *testing.T) {
 		ops           *Options
 		expectSuccess bool
 	}{
-		{"mysql", "mysql", "foo", nil, false},
+		{"mysql_fail", "mysql", "foo", nil, false},
 		{"mysql_ops", "mysql", "foo", &Options{MaxOpen: 10, MaxIdle: 4, MaxLifetime: 1 * time.Hour}, false},
-		{"pg", "postgres", "foo", nil, false},
-		{"pg_ops", "postgres", "foo", &Options{MaxOpen: 10, MaxIdle: 4, MaxLifetime: 1 * time.Hour}, false},
+		{"pg_fail", "postgres", "foo", nil, false},
+		{"pg", "postgres", pgTestDatabaseConnectionString, nil, false},
+		{"pg_ops", "postgres", pgTestDatabaseConnectionString, &Options{MaxOpen: 10, MaxIdle: 4, MaxLifetime: 1 * time.Hour}, false},
 		{"invalid", "banana", "foo", nil, false},
 	}
 
