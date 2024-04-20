@@ -97,8 +97,8 @@ func Test_NewSQLite(t *testing.T) {
 		ops           *Options
 		expectSuccess bool
 	}{
-		{"sqlite", ":memory:", nil, true},
-		{"sqlite_fail", "./testdata/test.db", nil, true},
+		{"sqlite_memory", ":memory:", nil, true},
+		{"sqlite_disk", "./testdata/test.db", nil, true},
 	}
 
 	for _, tt := range tests {
