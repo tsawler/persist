@@ -24,6 +24,16 @@ type Options struct {
 	MaxLifetime time.Duration
 }
 
+// NewPostgres is a convenience function for getting a pool of Postgres connections.
+func NewPostgres(dsn string, ops *Options) (*sql.DB, error) {
+	return New("pg", dsn, ops)
+}
+
+// NewMariaDB is a convenience function for getting a pool of MariaDB/MySQL connections.
+func NewMariaDB(dsn string, ops *Options) (*sql.DB, error) {
+	return New("mariadb", dsn, ops)
+}
+
 // New is a factory method which takes a db type, a pgConnectionString and options and attempts
 // to open a connection to the database and return a pgPool of connections.
 func New(db, dsn string, ops *Options) (*sql.DB, error) {
