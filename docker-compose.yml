@@ -1,0 +1,26 @@
+services:
+
+  mariadb:
+    image: 'mariadb:11.3'
+    ports:
+      - "3307:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: foo
+      MYSQL_USER: mariadb
+      MYSQL_PASSWORD: password
+
+  postgres:
+    image: 'postgres:16.2'
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: foo
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - '5433:5432'
