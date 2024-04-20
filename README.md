@@ -4,7 +4,7 @@ Persist is a simple package that reduces boilerplate code when getting a pool of
 a database.
 
 This project does nothing particularly spectacular; it exists simply to save me writing the same 100 lines of code
-everytime I need to connect to a database.
+every time I need to connect to a database.
 
 Currently, this project supports Postgres, MariaDB/MySQL, and sqlite.
 
