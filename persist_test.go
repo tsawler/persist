@@ -89,3 +89,25 @@ func Test_NewMariaDB(t *testing.T) {
 		}
 	}
 }
+
+func Test_NewSQLite(t *testing.T) {
+	tests := []struct {
+		name          string
+		dsn           string
+		ops           *Options
+		expectSuccess bool
+	}{
+		{"sqlite", ":memory:", nil, true},
+		{"sqlite_fail", "./testdata/test.db", nil, true},
+	}
+
+	for _, tt := range tests {
+		_, err := NewSQLite(tt.dsn, nil)
+		if err != nil && tt.expectSuccess {
+			t.Errorf("%s: expected no error but got one: %s", tt.name, err.Error())
+		}
+		if err == nil && !tt.expectSuccess {
+			t.Errorf("%s: expected error but did not get one", tt.name)
+		}
+	}
+}
