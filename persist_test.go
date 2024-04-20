@@ -32,3 +32,48 @@ func Test_New(t *testing.T) {
 		}
 	}
 }
+
+func Test_NewPostgres(t *testing.T) {
+	tests := []struct {
+		name          string
+		dsn           string
+		ops           *Options
+		expectSuccess bool
+	}{
+		{"pg_fail", "foo", nil, false},
+		{"pg", pgConnString, nil, true},
+		{"pg_ops", pgConnString, &Options{MaxOpen: 10, MaxIdle: 4, MaxLifetime: 1 * time.Hour}, true}}
+
+	for _, tt := range tests {
+		_, err := NewPostgres(tt.dsn, tt.ops)
+		if err != nil && tt.expectSuccess {
+			t.Errorf("%s: expected no error but got one: %s", tt.name, err.Error())
+		}
+		if err == nil && !tt.expectSuccess {
+			t.Errorf("%s: expected error but did not get one", tt.name)
+		}
+	}
+}
+
+func Test_NewMariaDB(t *testing.T) {
+	tests := []struct {
+		name          string
+		dsn           string
+		ops           *Options
+		expectSuccess bool
+	}{
+		{"mariadb", mariadbConnString, nil, true},
+		{"mariadb_fail", "foo", nil, false},
+		{"mariadb_ops", "foo", &Options{MaxOpen: 10, MaxIdle: 4, MaxLifetime: 1 * time.Hour}, false},
+	}
+
+	for _, tt := range tests {
+		_, err := NewMariaDB(tt.dsn, tt.ops)
+		if err != nil && tt.expectSuccess {
+			t.Errorf("%s: expected no error but got one: %s", tt.name, err.Error())
+		}
+		if err == nil && !tt.expectSuccess {
+			t.Errorf("%s: expected error but did not get one", tt.name)
+		}
+	}
+}
