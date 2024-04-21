@@ -19,18 +19,15 @@ import (
 var pgConnString = "host=localhost port=5433 user=postgres password=password dbname=foo sslmode=disable"
 var mariadbConnString = "mariadb:password@tcp(localhost:3307)/foo?parseTime=true&tls=false&collation=utf8_unicode_ci&timeout=5s&readTimeout5"
 
-//func TestMain(m *testing.M) {
-//	code := m.Run()
-//	os.Exit(code)
-//}
-
 var (
-	host     = "localhost"
-	user     = "postgres"
-	password = "password"
-	dbName   = "foo"
-	port     = "5433"
-	dsn      = "host=%s port=%s user=%s password=%s dbname=%s sslmode=disable timezone=UTC connect_timeout=5"
+	host        = "localhost"
+	user        = "postgres"
+	mariadbUser = "mariadb"
+	password    = "password"
+	dbName      = "foo"
+	pgPort      = "5433"
+	mariadbPort = "3307"
+	dsn         = "host=%s port=%s user=%s password=%s dbname=%s sslmode=disable timezone=UTC connect_timeout=5"
 )
 
 var resource *dockertest.Resource
@@ -73,7 +70,7 @@ func postgresUp() (*dockertest.Resource, *dockertest.Pool) {
 		ExposedPorts: []string{"5432"},
 		PortBindings: map[docker.Port][]docker.PortBinding{
 			"5432": {
-				{HostIP: "0.0.0.0", HostPort: port},
+				{HostIP: "0.0.0.0", HostPort: pgPort},
 			},
 		},
 	}
@@ -88,7 +85,7 @@ func postgresUp() (*dockertest.Resource, *dockertest.Pool) {
 	// start the image and wait until it's ready
 	if err := pool.Retry(func() error {
 		var err error
-		testDB, err := sql.Open("pgx", fmt.Sprintf(dsn, host, port, user, password, dbName))
+		testDB, err := sql.Open("pgx", fmt.Sprintf(dsn, host, pgPort, user, password, dbName))
 		if err != nil {
 			log.Println("Error:", err)
 			return err
@@ -115,14 +112,14 @@ func mariadbUp() (*dockertest.Resource, *dockertest.Pool) {
 		Tag:        "10.6",
 		Env: []string{
 			"MYSQL_ROOT_PASSWORD=" + password,
-			"MYSQL_USER=mariadb",
+			"MYSQL_USER=" + mariadbUser,
 			"MYSQL_PASSWORD=" + password,
 			"MYSQL_DATABASE=" + dbName,
 		},
 		ExposedPorts: []string{"3306"},
 		PortBindings: map[docker.Port][]docker.PortBinding{
 			"3306": {
-				{HostIP: "0.0.0.0", HostPort: "3307"},
+				{HostIP: "0.0.0.0", HostPort: mariadbPort},
 			},
 		},
 	}
