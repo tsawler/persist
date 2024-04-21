@@ -2,7 +2,6 @@ package persist
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"log"
@@ -14,17 +13,13 @@ var pgConnString = "host=localhost port=5433 user=postgres password=password dbn
 var mariadbConnString = "mariadb:password@tcp(localhost:3307)/foo?parseTime=true&tls=false&collation=utf8_unicode_ci&timeout=5s&readTimeout5"
 
 var (
-	host        = "localhost"
 	user        = "postgres"
 	mariadbUser = "mariadb"
 	password    = "password"
 	dbName      = "foo"
 	pgPort      = "5433"
 	mariadbPort = "3307"
-	dsn         = "host=%s port=%s user=%s password=%s dbname=%s sslmode=disable timezone=UTC connect_timeout=5"
 )
-
-var resource *dockertest.Resource
 
 func TestMain(m *testing.M) {
 	pgResource, pgPool := postgresUp()
@@ -70,7 +65,7 @@ func postgresUp() (*dockertest.Resource, *dockertest.Pool) {
 	}
 
 	// get a resource (docker image)
-	resource, err = pool.RunWithOptions(&opts)
+	resource, err := pool.RunWithOptions(&opts)
 	if err != nil {
 		_ = pool.Purge(resource)
 		log.Fatalf("could not start resource: %s", err)
@@ -78,11 +73,10 @@ func postgresUp() (*dockertest.Resource, *dockertest.Pool) {
 
 	// start the image and wait until it's ready
 	if err := pool.Retry(func() error {
-		var err error
-		testDB, err := sql.Open("pgx", fmt.Sprintf(dsn, host, pgPort, user, password, dbName))
-		if err != nil {
-			log.Println("Error:", err)
-			return err
+		testDB, retryErr := sql.Open("pgx", pgConnString)
+		if retryErr != nil {
+			log.Println("Error:", retryErr)
+			return retryErr
 		}
 		return testDB.Ping()
 	}); err != nil {
@@ -119,7 +113,7 @@ func mariadbUp() (*dockertest.Resource, *dockertest.Pool) {
 	}
 
 	// get a resource (docker image)
-	resource, err = pool.RunWithOptions(&opts)
+	resource, err := pool.RunWithOptions(&opts)
 	if err != nil {
 		_ = pool.Purge(resource)
 		log.Fatalf("could not start resource: %s", err)
@@ -127,10 +121,9 @@ func mariadbUp() (*dockertest.Resource, *dockertest.Pool) {
 
 	// start the image and wait until it's ready
 	if err := pool.Retry(func() error {
-		var err error
-		testDB, err := sql.Open("mysql", mariadbConnString)
-		if err != nil {
-			return err
+		testDB, retryErr := sql.Open("mysql", mariadbConnString)
+		if retryErr != nil {
+			return retryErr
 		}
 		return testDB.Ping()
 	}); err != nil {
