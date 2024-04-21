@@ -20,7 +20,7 @@ import (
 
 func main() {
 	// Specify your connection string.
-	dsn := "host=localhost port=5433 user=postgres password=password dbname=foo sslmode=disable timezone=UTC connect_timeout=5"
+	dsn := "host=localhost port=5433 user=postgres password=password dbname=foo sslmode=disable"
 
 	// Get a pool of connections. The first parameter can be "postgres", "mariadb", "mysql", or "sqlite".
 	conn, err := persist.New("postgres", dsn, nil)
