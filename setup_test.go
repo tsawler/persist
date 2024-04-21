@@ -8,12 +8,6 @@ import (
 	"log"
 	"os"
 	"testing"
-
-	_ "github.com/glebarez/go-sqlite"
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/jackc/pgconn"
-	_ "github.com/jackc/pgx/v5"
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 var pgConnString = "host=localhost port=5433 user=postgres password=password dbname=foo sslmode=disable"
