@@ -112,5 +112,10 @@ func Test_NewSQLite(t *testing.T) {
 		}
 	}
 
-	defer os.Remove("./testdata/test.db")
+	defer func() {
+		err := os.Remove("./testdata/test.db")
+		if err != nil {
+			// do nothing
+		}
+	}()
 }
