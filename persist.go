@@ -3,12 +3,12 @@ package persist
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	_ "github.com/glebarez/go-sqlite"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgx/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
-
 	"strings"
 	"time"
 )
@@ -92,4 +92,18 @@ func connect(driver, dsn string) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+// BuildConnectionString takes parameters sufficient to build a connection string for postgres/mysql.
+func BuildConnectionString(dbType, host, user, pass, ssl, db string, port int) (string, error) {
+	switch dbType {
+	case "postgres", "pg", "pgx", "postgresql":
+		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s", host, port, user, pass, db, ssl)
+		return dsn, nil
+	case "mysql", "mariadb":
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d/%s??parseTime=true&tls=%s&collation=utf8_unicode_ci&timeout=5s&readTimeout=5s", user, pass, host, port, db, ssl)
+		return dsn, nil
+	default:
+		return "", errors.New("error building dsn")
+	}
 }

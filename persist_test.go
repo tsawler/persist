@@ -119,3 +119,37 @@ func Test_NewSQLite(t *testing.T) {
 		}
 	}()
 }
+
+func TestBuildConnectionString(t *testing.T) {
+	tests := []struct {
+		name          string
+		dbType        string
+		host          string
+		user          string
+		pass          string
+		ssl           string
+		db            string
+		port          int
+		expected      string
+		expectSuccess bool
+	}{
+		{"pg", "pg", "localhost", "user", "pass", "foo", "disable", 5432, "host=localhost port=5432 user=user password=pass dbname=foo sslmode=disable", true},
+		{"mysql", "mysql", "localhost", "user", "pass", "foo", "false", 3306, "user:pass@tcp(localhost:3306)/foo?parseTime=true&tls=false&collation=utf8_unicode_ci&timeout=5s&readTimeout=5s", true},
+		{"bad", "fish", "localhost", "user", "pass", "foo", "false", 3306, "", false},
+	}
+
+	for _, tt := range tests {
+		result, err := BuildConnectionString(tt.dbType, tt.host, tt.user, tt.pass, tt.ssl, tt.db, tt.port)
+		if err != nil && tt.expectSuccess {
+			t.Errorf("%s: expected no error but got one: %s", tt.name, err.Error())
+		}
+		if err == nil && !tt.expectSuccess {
+			t.Errorf("%s: expected error but did not get one", tt.name)
+		}
+		if tt.expectSuccess {
+			if tt.expected != tt.expected {
+				t.Errorf("%s: expected %s but got %s", tt.name, tt.expected, result)
+			}
+		}
+	}
+}

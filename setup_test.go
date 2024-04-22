@@ -10,7 +10,7 @@ import (
 )
 
 var pgConnString = "host=localhost port=5433 user=postgres password=password dbname=foo sslmode=disable"
-var mariadbConnString = "mariadb:password@tcp(localhost:3307)/foo?parseTime=true&tls=false&collation=utf8_unicode_ci&timeout=5s&readTimeout5"
+var mariadbConnString = "mariadb:password@tcp(localhost:3307)/foo?parseTime=true&tls=false&collation=utf8_unicode_ci&timeout=5s&readTimeout=5s"
 
 var (
 	user        = "postgres"
