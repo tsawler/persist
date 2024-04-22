@@ -101,7 +101,7 @@ func BuildConnectionString(dbType, host, user, pass, ssl, db string, port int) (
 		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s", host, port, user, pass, db, ssl)
 		return dsn, nil
 	case "mysql", "mariadb":
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d/%s??parseTime=true&tls=%s&collation=utf8_unicode_ci&timeout=5s&readTimeout=5s", user, pass, host, port, db, ssl)
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d/%s?parseTime=true&tls=%s&collation=utf8_unicode_ci&timeout=5s&readTimeout=5s", user, pass, host, port, db, ssl)
 		return dsn, nil
 	default:
 		return "", errors.New("error building dsn")
