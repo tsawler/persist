@@ -61,7 +61,7 @@ func New(db, dsn string, ops *Options) (*sql.DB, error) {
 	switch engine {
 	case "mysql", "mariadb":
 		return connect("mysql", dsn)
-	case "postgres", "pg", "postgresql":
+	case "postgres", "pg", "pgx", "postgresql":
 		return connect("pgx", dsn)
 	case "sqlite":
 		return connect("sqlite", dsn)
