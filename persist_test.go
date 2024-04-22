@@ -1,6 +1,7 @@
 package persist
 
 import (
+	"os"
 	"testing"
 	"time"
 )
@@ -110,4 +111,6 @@ func Test_NewSQLite(t *testing.T) {
 			t.Errorf("%s: expected error but did not get one", tt.name)
 		}
 	}
+
+	defer os.Remove("./testdata/test.db")
 }

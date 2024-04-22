@@ -41,7 +41,7 @@ func NewSQLite(dsn string, ops *Options) (*sql.DB, error) {
 	return New("sqlite", dsn, ops)
 }
 
-// New is a factory method which takes a db type, a pgConnectionString and options and attempts
+// New is a factory method which takes a db type, a DSN and options and attempts
 // to open a connection to the database and return a pool of connections.
 func New(db, dsn string, ops *Options) (*sql.DB, error) {
 	engine := strings.ToLower(db)
@@ -60,38 +60,25 @@ func New(db, dsn string, ops *Options) (*sql.DB, error) {
 
 	switch engine {
 	case "mysql", "mariadb":
-		return connectToMySQL(dsn)
+		return connect("mysql", dsn)
 	case "postgres", "pg", "postgresql":
-		return connectToPostgres(dsn)
+		return connect("pgx", dsn)
 	case "sqlite":
-		return connectToSQLite(dsn)
+		return connect("sqlite", dsn)
 	default:
 		return nil, errors.New("invalid database engine supplied")
 	}
 }
 
-// connectToMySQL attempts to get a pool of connections for a MySQL/MariaDB database.
-func connectToMySQL(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	// test ping
-	if err = db.Ping(); err != nil {
-		return nil, err
-	}
-
-	db.SetMaxOpenConns(MaxOpenConns)
-	db.SetMaxIdleConns(MaxIdleConns)
-	db.SetConnMaxLifetime(ConnMaxLifetime)
-
-	return db, nil
-}
-
-// connectToPostgres attempts to get a pool of connections for a postgres database.
-func connectToPostgres(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("pgx", dsn)
+// connect attempts to get a pool of connections for a given database
+// with the DSN supplied as dsn.
+// Note that for sqlite, dsn can be one of ":memory:" for in memory, or
+// "path/to/some.db" for disk based storage. In order to avoid "database
+// is locked errors" you must set MaxOpenConns to 1 so that only 1
+// connection is ever used by the DB, allowing concurrent access to
+// DB without making the writes concurrent
+func connect(driver, dsn string) (*sql.DB, error) {
+	db, err := sql.Open(driver, dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -103,24 +90,6 @@ func connectToPostgres(dsn string) (*sql.DB, error) {
 	if err = db.Ping(); err != nil {
 		return nil, err
 	}
-
-	return db, nil
-}
-
-// connectToSQLite attempts to get a pool of connections for a sqlite database. Here,
-// dsn can be one of ":memory:" for in memory, or "path/to/some.db" for disk based storage.
-// Note that to avoid "database is locked errors" you must set MaxOpenConns to 1 so that only 1
-// connection is  ever used by the DB, allowing concurrent access to DB without making the
-// writes concurrent.
-func connectToSQLite(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite", dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	db.SetMaxOpenConns(MaxOpenConns)
-	db.SetMaxIdleConns(MaxIdleConns)
-	db.SetConnMaxLifetime(ConnMaxLifetime)
 
 	return db, nil
 }
