@@ -14,12 +14,12 @@ import (
 )
 
 var (
-	MaxOpenConns    = 12              // Maximum number of open connections in our pgPool.
-	MaxIdleConns    = 6               // Maximum idle connections in our pgPool.
+	MaxOpenConns    = 12              // Maximum number of open connections in our pool.
+	MaxIdleConns    = 6               // Maximum idle connections in our pool.
 	ConnMaxLifetime = 0 * time.Second // Max lifetime for a connection (how long before it expires). 0 is forever.
 )
 
-// Options holds useful options for a pgPool of connections.
+// Options holds useful options for a pool of connections.
 type Options struct {
 	MaxOpen     int
 	MaxIdle     int
