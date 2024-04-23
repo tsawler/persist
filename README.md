@@ -27,8 +27,20 @@ import (
 )
 
 func main() {
-	// Specify your connection string.
-	dsn := "host=localhost port=5433 user=postgres password=password dbname=foo sslmode=disable"
+	// You can specify your connection string.
+	// dsn := "host=localhost port=5433 user=postgres password=password dbname=foo sslmode=disable"
+
+	// Alternatively, build a connection string like this:
+	connectionData := persist.ConnectionData{
+		DBType:   "pg",
+		UserName: "postgres",
+		Password: "password",
+		Host:     "localhost",
+		Database: "foo",
+		SSL:      "disable",
+		Port:     5433,
+	}
+	dsn, err := persist.BuildConnectionString(connectionData)
 
 	// Get a pool of connections. The first parameter can be "postgres", "mariadb", "mysql", or "sqlite".
 	conn, err := persist.New("postgres", dsn, nil)
@@ -39,4 +51,5 @@ func main() {
 
 	log.Println("Connected to db successfully.")
 }
+
 ~~~
