@@ -139,7 +139,16 @@ func TestBuildConnectionString(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		result, err := BuildConnectionString(tt.dbType, tt.host, tt.user, tt.pass, tt.ssl, tt.db, tt.port)
+		cd := ConnectionData{
+			DBType:   tt.dbType,
+			UserName: tt.user,
+			Password: tt.pass,
+			Host:     tt.host,
+			Database: tt.db,
+			SSL:      tt.ssl,
+			Port:     tt.port,
+		}
+		result, err := BuildConnectionString(cd)
 		if err != nil && tt.expectSuccess {
 			t.Errorf("%s: expected no error but got one: %s", tt.name, err.Error())
 		}

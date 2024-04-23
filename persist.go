@@ -26,6 +26,17 @@ type Options struct {
 	MaxLifetime time.Duration
 }
 
+// ConnectionData is the type used to hold information required to build a connection string.
+type ConnectionData struct {
+	DBType   string
+	UserName string
+	Password string
+	Host     string
+	Database string
+	SSL      string
+	Port     int
+}
+
 // NewPostgres is a convenience function for getting a pool of Postgres connections.
 func NewPostgres(dsn string, ops *Options) (*sql.DB, error) {
 	return New("pg", dsn, ops)
@@ -94,14 +105,27 @@ func connect(driver, dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
-// BuildConnectionString takes parameters sufficient to build a connection string for postgres/mysql.
-func BuildConnectionString(dbType, host, user, pass, ssl, db string, port int) (string, error) {
-	switch dbType {
+// BuildConnectionString takes information stored in a ConnectionData variable and builds a connection string for
+// postgres/mysql.
+func BuildConnectionString(cd ConnectionData) (string, error) {
+	switch cd.DBType {
 	case "postgres", "pg", "pgx", "postgresql":
-		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s", host, port, user, pass, db, ssl)
+		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+			cd.Host,
+			cd.Port,
+			cd.UserName,
+			cd.Password,
+			cd.Database,
+			cd.SSL)
 		return dsn, nil
 	case "mysql", "mariadb":
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d/%s?parseTime=true&tls=%s&collation=utf8_unicode_ci&timeout=5s&readTimeout=5s", user, pass, host, port, db, ssl)
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d/%s?parseTime=true&tls=%s&collation=utf8_unicode_ci&timeout=5s&readTimeout=5s",
+			cd.UserName,
+			cd.Password,
+			cd.Host,
+			cd.Port,
+			cd.Database,
+			cd.SSL)
 		return dsn, nil
 	default:
 		return "", errors.New("error building dsn")
