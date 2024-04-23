@@ -51,5 +51,4 @@ func main() {
 
 	log.Println("Connected to db successfully.")
 }
-
 ~~~
