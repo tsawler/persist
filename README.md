@@ -38,7 +38,7 @@ func main() {
 		Host:     "localhost",
 		Database: "foo",
 		SSL:      "disable",
-		Port:     5433,
+		Port:     5432,
 	}
 	dsn, err := persist.BuildConnectionString(connectionData)
 
